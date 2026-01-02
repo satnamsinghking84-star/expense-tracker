@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Expense Tracker</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f4f6f8;
+    padding: 15px;
+}
+h2 { text-align: center; }
+#totalBox {
+    background: #d4edda;
+    padding: 15px;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    border-radius: 6px;
+}
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 16px;
+}
+button {
+    background: #1976d2;
+    color: white;
+    border: none;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🧾 Daily Expense Tracker</h2>
+
+<div id="totalBox">Total Kharcha: ₹0</div>
+
+<input id="expenseInput" placeholder="Jaise: kal 200 petrol">
+<button onclick="addExpense()">Add Expense</button>
+
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Time</th>
+<th>Description</th>
+<th>Amount</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    loadData();
+});
+
+function addExpense() {
+    const input = document.getElementById("expenseInput");
+    const text = input.value.trim();
+    if (!text) return alert("Kuch likhiye");
+
+    const amountMatch = text.match(/\d+/);
+    if (!amountMatch) {
+        alert("Amount nahi mila");
+        return;
+    }
+
+    const amount = parseInt(amountMatch[0]);
+    const now = new Date();
+
+    const data = JSON.parse(localStorage.getItem("expenses") || "[]");
+
+    data.push({
+        date: now.toLocaleDateString("en-IN"),
+        time: now.toLocaleTimeString("en-IN"),
+        desc: text,
+        amount: amount
+    });
+
+    localStorage.setItem("expenses", JSON.stringify(data));
+    input.value = "";
+    loadData();
+}
+
+function loadData() {
+    const table = document.getElementById("tableBody");
+    table.innerHTML = "";
+
+    const data = JSON.parse(localStorage.getItem("expenses") || "[]");
+    let total = 0;
+
+    data.forEach(e => {
+        total += e.amount;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${e.date}</td>
+            <td>${e.time}</td>
+            <td>${e.desc}</td>
+            <td>₹${e.amount}</td>
+        `;
+        table.appendChild(row);
+    });
+
+    document.getElementById("totalBox").innerText = "Total Kharcha: ₹" + total;
+}
+</script>
+
+</body>
+</html>
